@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mental Growth</title>
+<meta name="description" content="Daily mental-math practice that grows a tree as your streak grows.">
+<meta name="theme-color" content="#2EA86A">
+<meta name="color-scheme" content="light">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mental Growth">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%23EEF4EC'/%3E%3Cpath d='M60 96 V58' stroke='%234A6A52' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='60' cy='50' r='22' fill='%232EA86A'/%3E%3Ccircle cx='44' cy='56' r='14' fill='%231F8E54'/%3E%3Ccircle cx='76' cy='55' r='14' fill='%235FB83C'/%3E%3Ccircle cx='54' cy='38' r='14' fill='%235FB83C'/%3E%3Ccircle cx='68' cy='40' r='13' fill='%232EA86A'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%23EEF4EC'/%3E%3Cpath d='M60 96 V58' stroke='%234A6A52' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='60' cy='50' r='22' fill='%232EA86A'/%3E%3Ccircle cx='44' cy='56' r='14' fill='%231F8E54'/%3E%3Ccircle cx='76' cy='55' r='14' fill='%235FB83C'/%3E%3Ccircle cx='54' cy='38' r='14' fill='%235FB83C'/%3E%3Ccircle cx='68' cy='40' r='13' fill='%232EA86A'/%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Mental%20Growth%22,%22short_name%22:%22Mental%20Growth%22,%22start_url%22:%22./%22,%22display%22:%22standalone%22,%22background_color%22:%22%23EEF4EC%22,%22theme_color%22:%22%232EA86A%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20120%20120'%3E%3Crect%20width='120'%20height='120'%20rx='26'%20fill='%23EEF4EC'/%3E%3Cpath%20d='M60%2096%20V58'%20stroke='%234A6A52'%20stroke-width='7'%20stroke-linecap='round'/%3E%3Ccircle%20cx='60'%20cy='50'%20r='22'%20fill='%232EA86A'/%3E%3Ccircle%20cx='44'%20cy='56'%20r='14'%20fill='%231F8E54'/%3E%3Ccircle%20cx='76'%20cy='55'%20r='14'%20fill='%235FB83C'/%3E%3Ccircle%20cx='54'%20cy='38'%20r='14'%20fill='%235FB83C'/%3E%3Ccircle%20cx='68'%20cy='40'%20r='13'%20fill='%232EA86A'/%3E%3C/svg%3E%22,%22sizes%22:%22any%22,%22type%22:%22image/svg+xml%22}]}">
+<style>html,body{height:100%;margin:0;background:#EEF4EC;-webkit-text-size-adjust:100%;overscroll-behavior-y:none}</style>
+</head>
+<body>
+<div id="app-root">
+<style>
+  :root{
+    --bg:#EEF4EC; --surface:#FFFFFF; --surface-2:#E4EFE1; --inset:#D9E7D5;
+    --ink:#16331F; --muted:#6E8472; --line:#CBDBC6;
+    --accent:#2EA86A; --accent-2:#5FB83C; --good:#1F9E5E; --bad:#CF4A3B;
+    --keyshadow:#C2D6BC; --btnshadow:#166E40;
+    --radius:16px;
+    --mono:ui-monospace,"SF Mono","Cascadia Code","Roboto Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+  }
+  #app-root *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  #app-root{
+    font-family:var(--sans); color:var(--ink);
+    background:radial-gradient(120% 80% at 50% -10%, #F6FBF3 0%, var(--bg) 60%);
+    min-height:100vh; min-height:100dvh; display:flex; justify-content:center;
+    padding:max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
+            max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    user-select:none;
+  }
+  .frame{width:100%; max-width:460px; display:flex; flex-direction:column; gap:14px}
+
+  /* shared bits */
+  .eyebrow{font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); font-weight:700}
+  .num{font-family:var(--mono); font-variant-numeric:tabular-nums; font-feature-settings:"tnum"}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px}
+  button{font-family:inherit; color:inherit; border:none; background:none; cursor:pointer}
+  .hide{display:none !important}
+
+  /* ===== topbar ===== */
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:0 2px}
+  .wordmark{display:flex; align-items:baseline; gap:7px; font-weight:800; letter-spacing:-.01em; font-size:17px}
+  .wordmark .dot{width:8px; height:8px; border-radius:50%; background:var(--accent); display:inline-block; transform:translateY(-1px)}
+  .iconbtn{width:40px; height:40px; border-radius:11px; border:1px solid var(--line); background:var(--surface);
+    display:grid; place-items:center; color:var(--muted)}
+  .iconbtn:active{transform:scale(.94)}
+  .iconbtn svg{width:18px; height:18px}
+
+  /* ===== home ===== */
+  .streak-card{display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:linear-gradient(135deg,#FFFFFF,#EAF4E6); position:relative; overflow:hidden; min-height:150px}
+  .streak-card::after{content:""; position:absolute; right:-30px; top:-30px; width:140px; height:140px;
+    background:radial-gradient(circle, rgba(46,168,106,.16), transparent 70%)}
+  .streak-num{font-size:50px; font-weight:800; line-height:.9; letter-spacing:-.03em}
+  .streak-meta{font-size:12px; color:var(--muted); margin-top:6px; max-width:165px}
+  .plant-wrap{display:flex; flex-direction:column; align-items:center; gap:5px; flex:0 0 auto; position:relative; z-index:1}
+  .plant{width:94px; height:110px; display:flex; align-items:flex-end; justify-content:center}
+  .plant svg{width:100%; height:100%; overflow:visible}
+  .plant.sm{width:62px; height:72px}
+  .stage-name{font-size:11px; font-weight:800; color:var(--accent); letter-spacing:.06em; text-transform:uppercase}
+  .next-stage{font-size:10px; color:var(--muted); text-align:center; line-height:1.3; max-width:104px}
+
+  .goal-label{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px}
+  .goal-count{font-size:13px; color:var(--muted)}
+  .goal-count b{color:var(--ink); font-size:15px}
+  .bar{height:12px; background:var(--inset); border-radius:99px; overflow:hidden; border:1px solid var(--line)}
+  .bar > span{display:block; height:100%; width:0;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2)); border-radius:99px;
+    transition:width .5s cubic-bezier(.2,.8,.2,1)}
+  .goal-done{margin-top:9px; font-size:12px; color:var(--good); font-weight:700; display:flex; align-items:center; gap:5px}
+
+  .triplet{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+  .stat{background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:13px 10px; text-align:center}
+  .stat .v{font-size:24px; font-weight:800; letter-spacing:-.02em}
+  .stat .k{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:3px}
+
+  .train-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
+  .ops{display:flex; gap:8px; margin-bottom:14px}
+  .op{flex:1; height:48px; border-radius:12px; border:1.5px solid var(--line); background:var(--surface-2);
+    font-family:var(--mono); font-size:21px; font-weight:700; color:var(--muted); transition:.14s}
+  .op[aria-pressed="true"]{border-color:var(--accent); color:var(--ink); background:#DBF0D6;
+    box-shadow:inset 0 0 0 1px rgba(46,168,106,.35)}
+  .op:active{transform:translateY(1px)}
+
+  .lvl-head{display:flex; justify-content:space-between; align-items:baseline; margin:16px 0 12px}
+  .lvl-tag{font-size:12px; color:var(--accent); font-weight:700; letter-spacing:.01em}
+  .stepper{display:flex; align-items:center; justify-content:space-between; gap:14px}
+  .step{width:62px; height:62px; border-radius:16px; background:var(--surface-2); border:1px solid var(--line);
+    font-family:var(--mono); font-size:32px; font-weight:700; color:var(--ink); line-height:1;
+    box-shadow:0 3px 0 var(--keyshadow); transition:transform .06s, box-shadow .06s}
+  .step:active{transform:translateY(3px); box-shadow:0 0 0 var(--keyshadow)}
+  .step:disabled{opacity:.32; box-shadow:none}
+  .lvl-readout{flex:1; text-align:center}
+  .lvl-n{font-size:44px; font-weight:800; line-height:1; letter-spacing:-.03em}
+  .lvl-of{font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-top:5px}
+  .pips{display:flex; gap:5px; margin-top:15px}
+  .pips span{flex:1; height:7px; border-radius:99px; background:var(--inset); border:1px solid var(--line)}
+  .pips span.on{background:linear-gradient(90deg,var(--accent),var(--accent-2)); border-color:transparent}
+  .subhead{margin:18px 0 10px}
+  .seg{display:flex; background:var(--inset); border:1px solid var(--line); border-radius:12px; padding:4px; gap:4px}
+  .seg button{flex:1; height:46px; border-radius:9px; font-family:var(--mono); font-size:17px; font-weight:700;
+    color:var(--muted); transition:.12s}
+  .seg button[aria-pressed="true"]{background:var(--surface); color:var(--ink); box-shadow:0 1px 3px rgba(22,51,31,.12)}
+  .seg button:active{transform:translateY(1px)}
+
+  .start{width:100%; height:62px; border-radius:15px; margin-top:4px;
+    background:linear-gradient(180deg,#35B477,#1E9655); color:#FFFFFF;
+    font-size:18px; font-weight:800; letter-spacing:.02em;
+    box-shadow:0 8px 22px rgba(30,150,85,.28); transition:.12s}
+  .start:active{transform:translateY(2px); box-shadow:0 4px 12px rgba(30,150,85,.3)}
+  .start:disabled{filter:grayscale(.7) brightness(.7); box-shadow:none; cursor:not-allowed}
+
+  /* ===== drill ===== */
+  .drill-top{display:flex; align-items:center; justify-content:space-between; padding:0 2px}
+  .rep-count{font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:700}
+  .rep-count b{color:var(--ink)}
+  .set-bar{height:6px; background:var(--inset); border-radius:99px; overflow:hidden; border:1px solid var(--line)}
+  .set-bar > span{display:block; height:100%; background:var(--accent-2); transition:width .35s ease}
+
+  .console{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px 18px 22px; text-align:center; position:relative; overflow:hidden;
+    box-shadow:inset 0 2px 10px rgba(22,51,31,.07)}
+  .console::before{content:""; position:absolute; inset:0 0 auto 0; height:3px;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent); opacity:.55}
+  .console.good{animation:flashGood .5s ease}
+  .console.bad{animation:flashBad .5s ease}
+  @keyframes flashGood{0%,100%{background:var(--surface)} 30%{background:#DBF0DD}}
+  @keyframes flashBad{0%,100%{background:var(--surface)} 30%{background:#F6DEDA}}
+  .prob{font-family:var(--mono); font-size:46px; font-weight:700; letter-spacing:-.02em; line-height:1.1}
+  .answer{font-family:var(--mono); font-size:40px; font-weight:700; margin-top:10px; min-height:48px;
+    color:#1B8A50; letter-spacing:.02em}
+  .answer .ph{color:var(--line)}
+  .answer .caret{display:inline-block; width:3px; height:34px; background:var(--accent); margin-left:3px;
+    transform:translateY(5px); animation:blink 1.05s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .verdict{min-height:22px; margin-top:12px; font-size:14px; font-weight:700; letter-spacing:.02em}
+  .verdict.good{color:var(--good)} .verdict.bad{color:var(--bad)}
+  .verdict .sub{color:var(--muted); font-weight:500; margin-left:6px}
+
+  .pad{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+  .key{height:66px; border-radius:14px; background:var(--surface-2); border:1px solid var(--line);
+    font-family:var(--mono); font-size:26px; font-weight:700; color:var(--ink);
+    box-shadow:0 3px 0 var(--keyshadow); transition:transform .06s, box-shadow .06s}
+  .key:active{transform:translateY(3px); box-shadow:0 0 0 var(--keyshadow)}
+  .key.util{font-size:21px; color:var(--muted)}
+  .key.enter{background:linear-gradient(180deg,#35B477,#1E9655); color:#FFFFFF; box-shadow:0 3px 0 var(--btnshadow)}
+  .key.enter:active{box-shadow:0 0 0 var(--btnshadow)}
+  .key:disabled{opacity:.45}
+
+  /* ===== summary ===== */
+  .summary{text-align:center; padding:26px 18px}
+  .summary .big{font-size:50px; font-weight:800; letter-spacing:-.03em; margin:6px 0}
+  .summary .acc{font-size:15px; color:var(--muted); margin-bottom:4px}
+  .summary .streak-line{margin-top:14px; font-size:14px; color:var(--accent); font-weight:700}
+  .bd{margin-top:20px; text-align:left; display:flex; flex-direction:column; gap:11px}
+  .bd-row{display:flex; align-items:center; gap:10px}
+  .bd-op{width:30px; font-family:var(--mono); font-size:18px; font-weight:700; color:var(--muted); text-align:center}
+  .bd-track{flex:1; height:9px; background:var(--inset); border-radius:99px; overflow:hidden; border:1px solid var(--line)}
+  .bd-track > span{display:block; height:100%; background:var(--good); border-radius:99px}
+  .bd-val{width:56px; text-align:right; font-family:var(--mono); font-size:13px; color:var(--muted)}
+  .summary-actions{display:flex; gap:10px; margin-top:22px}
+  .btn{flex:1; height:54px; border-radius:14px; font-size:16px; font-weight:800; transition:.12s}
+  .btn:active{transform:translateY(2px)}
+  .btn-primary{background:linear-gradient(180deg,#35B477,#1E9655); color:#FFFFFF; box-shadow:0 5px 14px rgba(30,150,85,.25)}
+  .btn-ghost{background:var(--surface-2); border:1px solid var(--line); color:var(--ink)}
+
+  /* ===== stats overlay ===== */
+  .overlay{position:fixed; inset:0; background:rgba(20,45,30,.5); backdrop-filter:blur(3px);
+    display:flex; align-items:flex-end; justify-content:center; z-index:30; padding:0}
+  .sheet{width:100%; max-width:460px; background:var(--bg); border:1px solid var(--line);
+    border-radius:22px 22px 0 0; padding:20px 18px 26px; max-height:88vh; overflow:auto;
+    animation:rise .28s cubic-bezier(.2,.8,.2,1)}
+  @keyframes rise{from{transform:translateY(30px); opacity:.5} to{transform:none; opacity:1}}
+  .sheet-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px}
+  .sheet-head h2{font-size:19px; font-weight:800; letter-spacing:-.01em}
+  .week{display:flex; align-items:flex-end; justify-content:space-between; gap:7px; height:118px;
+    padding:10px 4px 0; margin-top:6px}
+  .day{flex:1; display:flex; flex-direction:column; align-items:center; gap:7px; height:100%; justify-content:flex-end}
+  .day .col{width:100%; max-width:30px; background:linear-gradient(180deg,var(--accent),var(--accent-2));
+    border-radius:6px 6px 3px 3px; min-height:4px; transition:height .4s ease}
+  .day .col.empty{background:var(--surface-2)}
+  .day .dl{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em}
+  .day .dv{font-size:11px; font-family:var(--mono); color:var(--muted)}
+  .twocol{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0}
+  .reset{width:100%; height:46px; border-radius:12px; background:transparent; border:1px solid var(--line);
+    color:var(--muted); font-size:13px; font-weight:700; margin-top:18px}
+  .reset:active{background:var(--surface)}
+
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+    background:var(--surface-2); border:1px solid var(--accent-2); color:var(--ink);
+    padding:11px 18px; border-radius:99px; font-size:13px; font-weight:700; opacity:0;
+    transition:.3s; z-index:40; pointer-events:none; box-shadow:0 8px 24px rgba(22,51,31,.18)}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  @media (prefers-reduced-motion: reduce){
+    #app-root *{animation:none !important; transition:none !important}
+  }
+</style>
+
+<div class="frame">
+  <!-- ============ HOME ============ -->
+  <div id="home">
+    <div class="topbar">
+      <div class="wordmark">Mental Growth<span class="dot"></span></div>
+      <button class="iconbtn" id="openStats" aria-label="View stats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <path d="M4 19V10M10 19V5M16 19v-6M22 19H2"/></svg>
+      </button>
+    </div>
+
+    <div class="card streak-card">
+      <div>
+        <div class="eyebrow">Day streak</div>
+        <div class="streak-num num" id="streakNum">0</div>
+        <div class="streak-meta" id="streakMeta">Start today to begin a streak</div>
+      </div>
+      <div class="plant-wrap">
+        <div class="plant" id="plant"></div>
+        <div class="stage-name" id="stageName">Seed</div>
+        <div class="next-stage" id="nextStage"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="goal-label">
+        <span class="eyebrow">Today's goal</span>
+        <span class="goal-count"><b class="num" id="todayDone">0</b> / <span class="num" id="goalNum">20</span> reps</span>
+      </div>
+      <div class="bar"><span id="goalFill"></span></div>
+      <div class="goal-done hide" id="goalDone">&#10003; Daily goal complete &#8212; anything more is a bonus</div>
+    </div>
+
+    <div class="triplet">
+      <div class="stat"><div class="v num" id="sAcc">&#8212;</div><div class="k">Accuracy</div></div>
+      <div class="stat"><div class="v num" id="sSolved">0</div><div class="k">Solved</div></div>
+      <div class="stat"><div class="v num" id="sBest">0</div><div class="k">Best streak</div></div>
+    </div>
+
+    <div class="card">
+      <div class="train-head">
+        <span class="eyebrow">What to train</span>
+      </div>
+      <div class="ops" id="ops">
+        <button class="op" data-op="add" aria-pressed="true">+</button>
+        <button class="op" data-op="sub" aria-pressed="true">&#8722;</button>
+        <button class="op" data-op="mul" aria-pressed="true">&#215;</button>
+        <button class="op" data-op="div" aria-pressed="false">&#247;</button>
+        <button class="op" data-op="pct" aria-pressed="true">%</button>
+      </div>
+      <div class="lvl-head">
+        <span class="eyebrow">Difficulty</span>
+        <span class="lvl-tag" id="lvlTag">&#8212;</span>
+      </div>
+      <div class="stepper">
+        <button class="step" id="lvlDown" aria-label="Lower the level">&#8722;</button>
+        <div class="lvl-readout">
+          <div class="lvl-n num" id="lvlN">1</div>
+          <div class="lvl-of">Level &#183; of 10</div>
+        </div>
+        <button class="step" id="lvlUp" aria-label="Raise the level">+</button>
+      </div>
+      <div class="pips" id="pips"></div>
+
+      <div class="subhead"><span class="eyebrow">Reps per set</span></div>
+      <div class="seg" id="reps">
+        <button data-r="10" aria-pressed="true">10</button>
+        <button data-r="20" aria-pressed="false">20</button>
+        <button data-r="30" aria-pressed="false">30</button>
+      </div>
+    </div>
+
+    <button class="start" id="startBtn">Start set &#183; 10 reps</button>
+  </div>
+
+  <!-- ============ DRILL ============ -->
+  <div id="drill" class="hide">
+    <div class="drill-top">
+      <button class="iconbtn" id="quitBtn" aria-label="End set">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+          <path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="rep-count">Rep <b class="num" id="repNow">1</b> / <span class="num" id="repTot">10</span></div>
+    </div>
+    <div class="set-bar"><span id="setFill"></span></div>
+
+    <div class="console" id="console">
+      <div class="prob" id="prob">&#8212; + &#8212;</div>
+      <div class="answer" id="answer"><span class="ph">0</span><span class="caret"></span></div>
+      <div class="verdict" id="verdict"></div>
+    </div>
+
+    <div class="pad" id="pad">
+      <button class="key" data-k="7">7</button>
+      <button class="key" data-k="8">8</button>
+      <button class="key" data-k="9">9</button>
+      <button class="key" data-k="4">4</button>
+      <button class="key" data-k="5">5</button>
+      <button class="key" data-k="6">6</button>
+      <button class="key" data-k="1">1</button>
+      <button class="key" data-k="2">2</button>
+      <button class="key" data-k="3">3</button>
+      <button class="key util" data-k="del" aria-label="Delete">&#9003;</button>
+      <button class="key" data-k="0">0</button>
+      <button class="key enter" data-k="enter" aria-label="Enter">&#10003;</button>
+    </div>
+  </div>
+
+  <!-- ============ SUMMARY ============ -->
+  <div id="summary" class="hide">
+    <div class="topbar"><div class="wordmark">Set complete<span class="dot"></span></div></div>
+    <div class="card summary">
+      <div class="plant sm" id="sumPlant" style="margin:0 auto 8px"></div>
+      <div class="eyebrow">You scored</div>
+      <div class="big num"><span id="sumCorrect">0</span><span style="color:var(--muted)">/</span><span id="sumTotal">10</span></div>
+      <div class="acc"><span class="num" id="sumAcc">0</span>% accuracy this set</div>
+      <div class="streak-line" id="sumStreak"></div>
+      <div class="bd" id="breakdown"></div>
+    </div>
+    <div class="summary-actions">
+      <button class="btn btn-ghost" id="doneBtn">Done</button>
+      <button class="btn btn-primary" id="againBtn">Train again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STATS SHEET ============ -->
+<div class="overlay hide" id="statsOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>Your training</h2>
+      <button class="iconbtn" id="closeStats" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+          <path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="eyebrow">Last 7 days &#183; reps</div>
+    <div class="week" id="week"></div>
+
+    <div class="twocol">
+      <div class="stat"><div class="v num" id="oTotal">0</div><div class="k">Total solved</div></div>
+      <div class="stat"><div class="v num" id="oAcc">&#8212;</div><div class="k">Overall accuracy</div></div>
+    </div>
+
+    <div class="eyebrow" style="margin-bottom:4px">Accuracy by type</div>
+    <div class="bd" id="opBreakdown"></div>
+
+    <button class="reset" id="resetBtn">Reset all progress</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = s => document.getElementById(s);
+  const OP_SYM = {add:"+", sub:"\u2212", mul:"\u00D7", div:"\u00F7", pct:"%"};
+  const REP_OPTIONS = [10, 20, 30];
+  const MAX_LEVEL = 10;
+  const STORE_KEY = "mentalgym:profile";
+
+  // 10 manual difficulty levels. Nothing auto-scales — the user steps these.
+  // Each: add[min,max] (both operands) · sub[min,max] minuend, subB min subtrahend
+  //       mul[aMin,aMax,bMin,bMax] · div[dMin,dMax,qMin,qMax] · pcts[] + pMult[min,max]
+  const LEVELS = [
+    {label:"Single digits",      add:[2,9],     sub:[5,15],   subB:1,  mul:[2,5,2,5],    div:[2,5,2,5],    pcts:[10,50,100],                 pMult:[1,10]},
+    {label:"Small numbers",      add:[2,15],    sub:[8,25],   subB:1,  mul:[2,6,2,6],    div:[2,6,2,6],    pcts:[10,25,50,100],              pMult:[1,10]},
+    {label:"Easy two-digit",     add:[5,30],    sub:[10,40],  subB:2,  mul:[2,9,2,7],    div:[2,7,2,8],    pcts:[10,20,25,50,100],           pMult:[1,12]},
+    {label:"Two-digit",          add:[10,50],   sub:[15,60],  subB:2,  mul:[3,9,3,9],    div:[3,9,3,9],    pcts:[10,20,25,50,75],            pMult:[1,12]},
+    {label:"Two-digit + tables", add:[15,99],   sub:[25,99],  subB:5,  mul:[3,12,3,12],  div:[3,12,3,12],  pcts:[10,20,25,30,40,50,75],      pMult:[1,12]},
+    {label:"Bigger two-digit",   add:[20,140],  sub:[40,160], subB:10, mul:[4,15,3,12],  div:[4,12,4,14],  pcts:[10,15,20,25,40,50,60,75],   pMult:[1,14]},
+    {label:"Into three-digit",   add:[40,250],  sub:[60,300], subB:15, mul:[6,19,4,12],  div:[4,14,6,16],  pcts:[5,10,15,20,25,35,50,75],    pMult:[1,16]},
+    {label:"Three-digit",        add:[60,399],  sub:[100,499],subB:20, mul:[11,29,4,9],  div:[4,15,6,19],  pcts:[5,12,15,35,60,80],          pMult:[1,16]},
+    {label:"Large numbers",      add:[100,650], sub:[150,750],subB:30, mul:[12,39,4,9],  div:[6,18,8,22],  pcts:[5,12,15,35,45,65,85],       pMult:[1,18]},
+    {label:"Max difficulty",     add:[200,999], sub:[300,999],subB:50, mul:[13,49,6,12], div:[7,20,9,25],  pcts:[5,12,15,35,45,55,65,85,95], pMult:[1,20]}
+  ];
+
+  // ---------- plant growth (driven by cumulative active days) ----------
+  const MAX_GROWTH = 465;
+  const THRESH = [0, 1, 5, 10, 30, 75, 150, 270, 365, 465];
+  const STAGE_NAMES = ["Seed","Sprout","Seedling","Young plant","Sapling",
+                       "Small tree","Growing tree","Mature tree","Full-grown tree","Fruiting tree"];
+  let pendingGrowToast = null;
+
+  function plantStage(g){
+    let idx=0;
+    for(let i=0;i<THRESH.length;i++){ if(g>=THRESH[i]) idx=i; }
+    let frac=1, nextName=null, daysToNext=0;
+    if(idx < THRESH.length-1){
+      const lo=THRESH[idx], hi=THRESH[idx+1];
+      frac=(g-lo)/(hi-lo); nextName=STAGE_NAMES[idx+1]; daysToNext=hi-g;
+    }
+    return {idx, name:STAGE_NAMES[idx], frac, nextName, daysToNext};
+  }
+
+  // --- tiny SVG primitives ---
+  function leaf(x,y,a,rx,ry,c){ return `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" transform="rotate(${a} ${x} ${y})" fill="${c}"/>`; }
+  function blob(x,y,r,c){ return `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`; }
+  function stem(topY,w){ return `<path d="M60 123 V${topY}" stroke="var(--accent)" stroke-width="${w}" stroke-linecap="round"/>`; }
+  function trunk(topY,w){ const h=w/2;
+    return `<path d="M${60-h} 124 L${(60-h*0.55).toFixed(1)} ${topY} Q60 ${topY-5} ${(60+h*0.55).toFixed(1)} ${topY} L${60+h} 124 Z" fill="#4A6A52"/>`; }
+  function canopy(cx,cy,s){ const L="var(--accent-2)", M="var(--accent)", D="#1F8E54";
+    return blob(cx,cy,22*s,M)+blob(cx-16*s,cy+6*s,15*s,D)+blob(cx+16*s,cy+5*s,15*s,L)
+         +blob(cx-7*s,cy-12*s,15*s,L)+blob(cx+8*s,cy-10*s,14*s,M)+blob(cx,cy+3*s,16*s,M)
+         +blob(cx-2*s,cy-3*s,15*s,L); }
+  function flower(x,y){ const p="#FFFFFF";
+    return blob(x,y-4,2.6,p)+blob(x+4,y-1,2.6,p)+blob(x+2.5,y+3.5,2.6,p)+blob(x-2.5,y+3.5,2.6,p)+blob(x-4,y-1,2.6,p)+blob(x,y,1.7,"var(--accent-2)"); }
+  function fruits(){ const pts=[[50,46],[71,44],[58,60],[75,62],[45,62],[64,34],[82,52]];
+    return pts.map(([x,y])=>blob(x,y,3.6,"#F2C14E")+blob(x-1,y-1,1.3,"#FAE0A0")).join(""); }
+
+  function plantBody(idx){
+    switch(idx){
+      case 0: return `<ellipse cx="60" cy="119" rx="7" ry="4.5" fill="#4A6A52"/>`
+                   + `<path d="M60 116 q1 -7 6 -9" stroke="var(--accent)" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      case 1: return stem(101,3.5)+leaf(50,102,-34,9,5,"var(--accent-2)")+leaf(70,102,34,9,5,"var(--accent)");
+      case 2: return stem(85,3.8)
+                   +leaf(48,106,-32,11,5.5,"var(--accent-2)")+leaf(72,106,32,11,5.5,"var(--accent)")
+                   +leaf(51,93,-30,9,4.5,"var(--accent)")+leaf(69,93,30,9,4.5,"var(--accent-2)")
+                   +leaf(60,84,0,5.5,10,"var(--accent-2)");
+      case 3: return stem(72,4.2)
+                   +leaf(45,110,-34,12,6,"var(--accent-2)")+leaf(75,110,34,12,6,"var(--accent)")
+                   +leaf(48,97,-30,11,5.5,"var(--accent)")+leaf(72,97,30,11,5.5,"var(--accent-2)")
+                   +leaf(51,85,-26,9.5,5,"var(--accent-2)")+leaf(69,85,26,9.5,5,"var(--accent)")
+                   +leaf(60,74,0,6,11,"var(--accent-2)");
+      case 4: return trunk(96,10)+canopy(60,82,0.82);
+      case 5: return trunk(88,12)+canopy(60,70,1.0);
+      case 6: return trunk(82,13)+canopy(60,62,1.18);
+      case 7: return trunk(76,15)+canopy(60,55,1.34);
+      case 8: return trunk(72,17)+canopy(60,50,1.5);
+      case 9: return trunk(72,17)+canopy(60,50,1.5)+fruits()+flower(40,40)+flower(82,66);
+    }
+    return "";
+  }
+
+  const GROUND = `<ellipse cx="60" cy="125" rx="42" ry="10" fill="var(--inset)"/><ellipse cx="60" cy="122" rx="33" ry="6.5" fill="#CFE2C9"/>`;
+
+  function plantSVG(idx, scale){
+    return `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">`
+      + GROUND
+      + `<g transform="translate(60 124) scale(${scale}) translate(-60 -124)">${plantBody(idx)}</g></svg>`;
+  }
+
+  function renderPlant(el, g, caption){
+    const st = plantStage(g);
+    const sc = (1 + 0.12*st.frac).toFixed(3);
+    el.innerHTML = plantSVG(st.idx, sc);
+    if(caption){
+      $("stageName").textContent = st.name;
+      const ns = $("nextStage");
+      if(st.nextName) ns.textContent = st.daysToNext + (st.daysToNext===1?" day to ":" days to ") + st.nextName.toLowerCase();
+      else ns.textContent = "Fully grown \u2014 fruit and all";
+    }
+  }
+
+  // ---------- persistence ----------
+  // Works in three environments, in priority order:
+  //   1. Inside Claude  -> window.storage (syncs with this chat)
+  //   2. Standalone app -> the browser's localStorage (persists on the device)
+  //   3. Last resort    -> in-memory only (this session)
+  const Store = (function(){
+    if(typeof window !== "undefined" && window.storage && typeof window.storage.get === "function"){
+      return window.storage;
+    }
+    try{
+      const probe = "__mg_probe__";
+      window.localStorage.setItem(probe, "1");
+      window.localStorage.removeItem(probe);
+      return {
+        async get(k){ const v = window.localStorage.getItem(k); return v === null ? null : {key:k, value:v}; },
+        async set(k,v){ window.localStorage.setItem(k, v); return {key:k, value:v}; },
+        async delete(k){ window.localStorage.removeItem(k); return {key:k, deleted:true}; }
+      };
+    }catch(e){
+      const m = {};
+      return {
+        async get(k){ return (k in m) ? {key:k, value:m[k]} : null; },
+        async set(k,v){ m[k] = v; return {key:k, value:v}; },
+        async delete(k){ delete m[k]; return {key:k, deleted:true}; }
+      };
+    }
+  })();
+
+  let mem = null;
+  async function loadProfile(){
+    const def = {
+      streak:0, bestStreak:0, lastActiveDate:null,
+      totalSolved:0, totalCorrect:0, dailyGoal:20,
+      ops:{add:true, sub:true, mul:true, div:false, pct:true},
+      level:3, setLength:10,
+      growthDays:0, lastDecayDate:null,
+      opStats:{add:[0,0], sub:[0,0], mul:[0,0], div:[0,0], pct:[0,0]}, // [solved, correct]
+      history:{} // 'YYYY-MM-DD': [solved, correct]
+    };
+    try{
+      const r = await Store.get(STORE_KEY);
+      if(r && r.value){
+        const p = Object.assign(def, JSON.parse(r.value));
+        // migrate older saves that used easy/medium/hard
+        if(typeof p.level !== "number"){
+          p.level = ({easy:2, medium:5, hard:8})[p.difficulty] || 3;
+        }
+        delete p.difficulty;
+        p.level = Math.min(MAX_LEVEL, Math.max(1, p.level));
+        if(!REP_OPTIONS.includes(p.setLength)) p.setLength = 10;
+        p.growthDays = Math.max(0, Math.min(MAX_GROWTH, p.growthDays || 0));
+        if(p.lastDecayDate === undefined) p.lastDecayDate = null;
+        return p;
+      }
+    }catch(e){ /* key missing or storage unavailable */ }
+    return def;
+  }
+  async function saveProfile(){
+    try{ await Store.set(STORE_KEY, JSON.stringify(profile)); }
+    catch(e){ mem = profile; }
+  }
+
+  // ---------- date helpers ----------
+  function dstr(d){ return d.toISOString().slice(0,10); }
+  function today(){ return dstr(new Date()); }
+  function shiftDay(base, n){ const d=new Date(base+"T00:00:00"); d.setDate(d.getDate()+n); return dstr(d); }
+
+  // ---------- runtime state ----------
+  let profile;
+  let run = null; // active set state
+
+  // ---------- problem generation ----------
+  function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function gcd(a,b){ while(b){ [a,b]=[b,a%b]; } return a; }
+
+  function genPct(cfg){
+    const p = pick(cfg.pcts);
+    const step = 100/gcd(p,100);
+    const base = step * ri(cfg.pMult[0], cfg.pMult[1]);
+    return { text:`${p}% of ${base}`, ans:(base*p)/100, op:"pct" };
+  }
+  function genProblem(){
+    const cfg = LEVELS[profile.level-1];
+    const enabled = Object.keys(profile.ops).filter(k=>profile.ops[k]);
+    const op = pick(enabled.length?enabled:["add"]);
+    let a,b;
+    if(op==="add"){
+      a=ri(cfg.add[0],cfg.add[1]); b=ri(cfg.add[0],cfg.add[1]);
+      return {text:`${a} + ${b}`, ans:a+b, op};
+    }
+    if(op==="sub"){
+      a=ri(cfg.sub[0],cfg.sub[1]); b=ri(cfg.subB, a);
+      return {text:`${a} \u2212 ${b}`, ans:a-b, op};
+    }
+    if(op==="mul"){
+      a=ri(cfg.mul[0],cfg.mul[1]); b=ri(cfg.mul[2],cfg.mul[3]);
+      return {text:`${a} \u00D7 ${b}`, ans:a*b, op};
+    }
+    if(op==="div"){
+      const d=ri(cfg.div[0],cfg.div[1]), q=ri(cfg.div[2],cfg.div[3]);
+      return {text:`${d*q} \u00F7 ${d}`, ans:q, op};
+    }
+    return genPct(cfg);
+  }
+
+  // ---------- toast ----------
+  let toastT;
+  function toast(msg){
+    const t=$("toast"); t.textContent=msg; t.classList.add("show");
+    clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1900);
+  }
+
+  // ---------- home rendering ----------
+  function renderHome(){
+    $("streakNum").textContent = profile.streak;
+    const t = today();
+    if(profile.lastActiveDate===t) $("streakMeta").textContent = "Trained today \u2014 keep it alive tomorrow";
+    else if(profile.lastActiveDate===shiftDay(t,-1)) $("streakMeta").textContent = "Train today to extend your streak";
+    else $("streakMeta").textContent = "Start today to begin a streak";
+    renderPlant($("plant"), profile.growthDays, true);
+
+    const todayRec = profile.history[t] || [0,0];
+    const done = todayRec[0], goal = profile.dailyGoal;
+    $("todayDone").textContent = done;
+    $("goalNum").textContent = goal;
+    $("goalFill").style.width = Math.min(100, (done/goal)*100) + "%";
+    $("goalDone").classList.toggle("hide", done < goal);
+
+    $("sAcc").textContent = profile.totalSolved ? Math.round(profile.totalCorrect/profile.totalSolved*100)+"%" : "\u2014";
+    $("sSolved").textContent = profile.totalSolved;
+    $("sBest").textContent = profile.bestStreak;
+
+    document.querySelectorAll("#ops .op").forEach(b=>{
+      b.setAttribute("aria-pressed", profile.ops[b.dataset.op] ? "true":"false");
+    });
+    // level stepper
+    const lv = profile.level;
+    $("lvlN").textContent = lv;
+    $("lvlTag").textContent = LEVELS[lv-1].label;
+    $("lvlDown").disabled = lv<=1;
+    $("lvlUp").disabled = lv>=MAX_LEVEL;
+    const pips = $("pips");
+    if(pips.children.length !== MAX_LEVEL){
+      pips.innerHTML = "";
+      for(let i=0;i<MAX_LEVEL;i++) pips.appendChild(document.createElement("span"));
+    }
+    Array.from(pips.children).forEach((s,i)=> s.classList.toggle("on", i < lv));
+    // reps per set
+    document.querySelectorAll("#reps button").forEach(b=>{
+      b.setAttribute("aria-pressed", (+b.dataset.r===profile.setLength) ? "true":"false");
+    });
+    const any = Object.values(profile.ops).some(Boolean);
+    $("startBtn").disabled = !any;
+    $("startBtn").textContent = any ? ("Start set \u00B7 "+profile.setLength+" reps") : "Pick at least one type";
+  }
+
+  function show(screen){
+    ["home","drill","summary"].forEach(s=>$(s).classList.toggle("hide", s!==screen));
+    window.scrollTo(0,0);
+  }
+
+  // ---------- drill ----------
+  function startSet(){
+    run = { idx:0, correct:0, entry:"", locked:false,
+            len:profile.setLength, opCounts:{}, current:null };
+    $("repTot").textContent = run.len;
+    show("drill");
+    nextProblem();
+  }
+  function nextProblem(){
+    run.current = genProblem();
+    run.entry = "";
+    run.locked = false;
+    $("prob").textContent = run.current.text;
+    $("repNow").textContent = run.idx + 1;
+    $("setFill").style.width = (run.idx/run.len*100) + "%";
+    $("verdict").textContent = ""; $("verdict").className = "verdict";
+    drawAnswer();
+  }
+  function drawAnswer(){
+    const a = $("answer");
+    if(run.entry===""){
+      a.innerHTML = '<span class="ph">0</span><span class="caret"></span>';
+    } else {
+      a.innerHTML = run.entry + '<span class="caret"></span>';
+    }
+  }
+  function pressKey(k){
+    if(!run) return;
+    if(run.locked){ // any key advances after a wrong answer
+      advance(); return;
+    }
+    if(k==="del"){ run.entry = run.entry.slice(0,-1); drawAnswer(); return; }
+    if(k==="enter"){ submit(); return; }
+    if(/^[0-9]$/.test(k)){
+      if(run.entry.length>=6) return;
+      if(run.entry==="0") run.entry = k; else run.entry += k;
+      drawAnswer();
+    }
+  }
+  function submit(){
+    if(run.entry==="") return;
+    const given = parseInt(run.entry,10);
+    const c = run.current;
+    const correct = given === c.ans;
+    // record
+    profile.totalSolved++;
+    profile.opStats[c.op][0]++;
+    run.opCounts[c.op] = run.opCounts[c.op] || [0,0];
+    run.opCounts[c.op][0]++;
+    if(correct){
+      profile.totalCorrect++; profile.opStats[c.op][1]++; run.correct++;
+      run.opCounts[c.op][1]++;
+    }
+    // daily history + streak
+    const t = today();
+    const rec = profile.history[t] || [0,0];
+    rec[0]++; if(correct) rec[1]++;
+    const wasBelowGoal = (rec[0]-1) < profile.dailyGoal;
+    profile.history[t] = rec;
+    markActiveToday(t);
+    pruneHistory();
+    saveProfile();
+
+    const grew = !!pendingGrowToast;
+    if(grew){ toast("\uD83C\uDF31 Grew into a "+pendingGrowToast.toLowerCase()+"!"); pendingGrowToast = null; }
+
+    // feedback
+    const con = $("console"), v = $("verdict");
+    con.classList.remove("good","bad"); void con.offsetWidth;
+    if(correct){
+      con.classList.add("good");
+      v.className = "verdict good"; v.textContent = "\u2713 Correct";
+      run.locked = true;
+      if(rec[0]===profile.dailyGoal && wasBelowGoal && !grew) toast("\uD83C\uDF89 Daily goal complete!");
+      setTimeout(()=>{ if(run && run.locked) advance(); }, 550);
+    } else {
+      con.classList.add("bad");
+      v.className = "verdict bad";
+      v.innerHTML = "\u2717 Answer: <b>"+c.ans+"</b><span class='sub'>tap any key to continue</span>";
+      run.locked = true;
+      if(rec[0]===profile.dailyGoal && wasBelowGoal && !grew) toast("\uD83C\uDF89 Daily goal complete!");
+    }
+  }
+  function advance(){
+    run.idx++;
+    $("setFill").style.width = (run.idx/run.len*100) + "%";
+    if(run.idx >= run.len){ finishSet(); }
+    else { nextProblem(); }
+  }
+
+  function markActiveToday(t){
+    if(profile.lastActiveDate===t) return;
+    if(profile.lastActiveDate===shiftDay(t,-1)) profile.streak++;
+    else profile.streak = 1;
+    const before = plantStage(profile.growthDays).idx;
+    profile.growthDays = Math.min(MAX_GROWTH, profile.growthDays + 1);
+    const after = plantStage(profile.growthDays).idx;
+    if(after > before) pendingGrowToast = STAGE_NAMES[after];
+    profile.lastActiveDate = t;
+    profile.lastDecayDate = t;             // today is accounted; no decay for today
+    if(profile.streak > profile.bestStreak) profile.bestStreak = profile.streak;
+  }
+  function daysBetween(a,b){ return Math.round((new Date(b+"T00:00:00") - new Date(a+"T00:00:00")) / 86400000); }
+  // Shrinks the plant by one growth-day for every full day missed since the last
+  // accounted day. Idempotent per day via lastDecayDate. Returns true if changed.
+  function applyDecay(t){
+    if(!profile.lastActiveDate) return false;
+    if(!profile.lastDecayDate) profile.lastDecayDate = profile.lastActiveDate;
+    const missed = Math.max(0, daysBetween(profile.lastDecayDate, t) - 1);
+    let changed = false;
+    if(missed > 0){ profile.growthDays = Math.max(0, profile.growthDays - missed); changed = true; }
+    const ydy = shiftDay(t,-1);
+    if(profile.lastDecayDate < ydy){ profile.lastDecayDate = ydy; changed = true; }
+    return changed;
+  }
+  function pruneHistory(){
+    const keep = {}; const t = today();
+    for(let i=0;i<14;i++){ const d=shiftDay(t,-i); if(profile.history[d]) keep[d]=profile.history[d]; }
+    profile.history = keep;
+  }
+
+  function finishSet(){
+    renderPlant($("sumPlant"), profile.growthDays, false);
+    $("sumCorrect").textContent = run.correct;
+    $("sumTotal").textContent = run.len;
+    const acc = Math.round(run.correct/run.len*100);
+    $("sumAcc").textContent = acc;
+    // streak line
+    let line;
+    if(profile.streak<=1) line = "\uD83C\uDF31 Streak started \u2014 day 1";
+    else line = "\uD83C\uDF31 "+profile.streak+" day streak going strong";
+    $("sumStreak").textContent = line;
+    // breakdown for this set
+    const bd = $("breakdown"); bd.innerHTML = "";
+    Object.keys(run.opCounts).forEach(op=>{
+      const [s,c] = run.opCounts[op];
+      const pct = Math.round(c/s*100);
+      const row = document.createElement("div"); row.className="bd-row";
+      row.innerHTML = `<div class="bd-op">${OP_SYM[op]}</div>
+        <div class="bd-track"><span style="width:${pct}%"></span></div>
+        <div class="bd-val">${c}/${s}</div>`;
+      bd.appendChild(row);
+    });
+    show("summary");
+  }
+
+  // ---------- stats sheet ----------
+  function renderStats(){
+    $("oTotal").textContent = profile.totalSolved;
+    $("oAcc").textContent = profile.totalSolved ? Math.round(profile.totalCorrect/profile.totalSolved*100)+"%" : "\u2014";
+    // week
+    const t = today();
+    let max = 1;
+    const days = [];
+    for(let i=6;i>=0;i--){ const d=shiftDay(t,-i); const rec=profile.history[d]||[0,0]; max=Math.max(max,rec[0]); days.push([d,rec[0]]); }
+    const wk = $("week"); wk.innerHTML="";
+    const dow = ["S","M","T","W","T","F","S"];
+    days.forEach(([d,n])=>{
+      const date = new Date(d+"T00:00:00");
+      const h = n? Math.max(8, n/max*92) : 4;
+      const el = document.createElement("div"); el.className="day";
+      el.innerHTML = `<div class="dv">${n||""}</div>
+        <div class="col ${n?"":"empty"}" style="height:${h}px"></div>
+        <div class="dl">${dow[date.getDay()]}</div>`;
+      wk.appendChild(el);
+    });
+    // by op
+    const ob = $("opBreakdown"); ob.innerHTML="";
+    let anyOp=false;
+    ["add","sub","mul","div","pct"].forEach(op=>{
+      const [s,c] = profile.opStats[op];
+      if(!s) return; anyOp=true;
+      const pct = Math.round(c/s*100);
+      const row = document.createElement("div"); row.className="bd-row";
+      row.innerHTML = `<div class="bd-op">${OP_SYM[op]}</div>
+        <div class="bd-track"><span style="width:${pct}%"></span></div>
+        <div class="bd-val">${pct}%</div>`;
+      ob.appendChild(row);
+    });
+    if(!anyOp) ob.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:4px 0">No reps yet \u2014 start a set to see your breakdown.</div>';
+  }
+
+  // ---------- events ----------
+  function wire(){
+    $("ops").addEventListener("click", e=>{
+      const b = e.target.closest(".op"); if(!b) return;
+      profile.ops[b.dataset.op] = !profile.ops[b.dataset.op];
+      saveProfile(); renderHome();
+    });
+    $("lvlDown").addEventListener("click", ()=>{
+      if(profile.level>1){ profile.level--; saveProfile(); renderHome(); }
+    });
+    $("lvlUp").addEventListener("click", ()=>{
+      if(profile.level<MAX_LEVEL){ profile.level++; saveProfile(); renderHome(); }
+    });
+    $("reps").addEventListener("click", e=>{
+      const b = e.target.closest("button"); if(!b) return;
+      profile.setLength = +b.dataset.r; saveProfile(); renderHome();
+    });
+    $("startBtn").addEventListener("click", startSet);
+    $("againBtn").addEventListener("click", startSet);
+    $("doneBtn").addEventListener("click", ()=>{ renderHome(); show("home"); });
+    $("quitBtn").addEventListener("click", ()=>{ run=null; renderHome(); show("home"); });
+
+    $("pad").addEventListener("click", e=>{
+      const b = e.target.closest(".key"); if(!b) return;
+      pressKey(b.dataset.k);
+    });
+    // hardware keyboard support
+    document.addEventListener("keydown", e=>{
+      if($("drill").classList.contains("hide")) return;
+      if(/^[0-9]$/.test(e.key)) pressKey(e.key);
+      else if(e.key==="Backspace"){ e.preventDefault(); pressKey("del"); }
+      else if(e.key==="Enter"){ e.preventDefault(); pressKey("enter"); }
+    });
+
+    $("openStats").addEventListener("click", ()=>{ renderStats(); $("statsOverlay").classList.remove("hide"); });
+    $("closeStats").addEventListener("click", ()=>$("statsOverlay").classList.add("hide"));
+    $("statsOverlay").addEventListener("click", e=>{ if(e.target.id==="statsOverlay") $("statsOverlay").classList.add("hide"); });
+    $("resetBtn").addEventListener("click", async ()=>{
+      if(!confirm("Reset all progress? This clears your streak, stats and history.")) return;
+      try{ await Store.delete(STORE_KEY); }catch(e){}
+      profile = await loadProfile(); mem=null;
+      renderStats(); renderHome();
+      toast("Progress reset");
+    });
+  }
+
+  // ---------- init ----------
+  (async function init(){
+    profile = await loadProfile();
+    // recover from in-memory fallback if storage is dead but we saved this session
+    if(mem) profile = mem;
+    if(applyDecay(today())) saveProfile();
+    wire(); renderHome();
+  })();
+})();
+</script>
+
+</body>
+</html>

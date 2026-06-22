@@ -132,9 +132,27 @@
 
   /* ===== drill ===== */
   .drill-top{display:flex; align-items:center; justify-content:space-between; padding:0 2px}
+  .drill-top-right{display:flex; align-items:center; gap:10px}
   .rep-count{font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:700}
   .rep-count b{color:var(--ink)}
-  .set-bar{height:6px; background:var(--inset); border-radius:99px; overflow:hidden; border:1px solid var(--line)}
+  .iconbtn.help{color:var(--accent); border-color:var(--accent)}
+  .iconbtn.help:active{transform:scale(.94)}
+  .iconbtn.help svg{width:22px; height:22px}
+  .help-problem{font-size:24px; font-weight:800; letter-spacing:-.01em; margin-top:3px}
+  .help-sheet .sheet-head{align-items:flex-start; margin-bottom:14px}
+  .help-strategy{display:inline-block; font-size:13px; font-weight:800; color:var(--accent);
+    background:var(--surface-2); border:1px solid var(--line); border-radius:99px; padding:6px 13px; margin:0 0 12px 1px}
+  .help-tip{font-size:14px; line-height:1.5; color:var(--ink); background:#EAF4E6; border-left:3px solid var(--accent-2);
+    border-radius:0 10px 10px 0; padding:11px 13px; margin-bottom:18px}
+  .help-steps{list-style:none; counter-reset:hstep; padding:0; margin:0; display:flex; flex-direction:column; gap:12px}
+  .help-steps li{counter-increment:hstep; display:flex; align-items:flex-start; gap:12px; font-size:15px; line-height:1.45; color:var(--ink)}
+  .help-steps li::before{content:counter(hstep); flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+    background:var(--accent); color:#fff; font-family:var(--sans); font-weight:800; font-size:13px;
+    display:flex; align-items:center; justify-content:center; margin-top:1px}
+  .help-step-txt{padding-top:3px}
+  .help-answer{margin-top:20px; padding:14px; text-align:center; border-radius:13px; background:var(--inset);
+    font-family:var(--mono); font-size:20px; font-weight:700; color:var(--ink)}
+  .help-answer b{color:var(--accent)}
   .set-bar > span{display:block; height:100%; background:var(--accent-2); transition:width .35s ease}
 
   .console{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
@@ -300,7 +318,13 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
           <path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
-      <div class="rep-count">Rep <b class="num" id="repNow">1</b> / <span class="num" id="repTot">10</span></div>
+      <div class="drill-top-right">
+        <div class="rep-count">Rep <b class="num" id="repNow">1</b> / <span class="num" id="repTot">10</span></div>
+        <button class="iconbtn help" id="helpBtn" aria-label="How to solve this">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.1 9a3 3 0 1 1 4.4 2.6c-.9.5-1.5 1.1-1.5 2.4"/><circle cx="12" cy="17.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+        </button>
+      </div>
     </div>
     <div class="set-bar"><span id="setFill"></span></div>
 
@@ -371,6 +395,26 @@
     <div class="bd" id="opBreakdown"></div>
 
     <button class="reset" id="resetBtn">Reset all progress</button>
+  </div>
+</div>
+
+<div class="overlay hide" id="helpOverlay">
+  <div class="sheet help-sheet">
+    <div class="sheet-head">
+      <div>
+        <div class="eyebrow">How to solve</div>
+        <div class="help-problem num" id="helpProblem">&nbsp;</div>
+      </div>
+      <button class="iconbtn" id="closeHelp" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+          <path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="help-strategy" id="helpStrategy"></div>
+    <div class="help-tip" id="helpTip"></div>
+    <ol class="help-steps" id="helpSteps"></ol>
+    <div class="help-answer" id="helpAnswer"></div>
   </div>
 </div>
 
@@ -556,11 +600,200 @@
   function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
   function gcd(a,b){ while(b){ [a,b]=[b,a%b]; } return a; }
 
+  // Builds a step-by-step mental-math walkthrough for the specific numbers on screen.
+  // Returns { title, tip, steps:[...], answer }.
+  function explain(p){
+    const a = p.a, b = p.b;
+    if(p.op === "add")  return explainAdd(a, b);
+    if(p.op === "sub")  return explainSub(a, b);
+    if(p.op === "mul")  return explainMul(a, b);
+    if(p.op === "div")  return explainDiv(a, b);   // a = dividend, b = divisor
+    if(p.op === "pct")  return explainPct(p.pct, p.base);
+    return { title:"", tip:"", steps:[], answer:p.ans };
+  }
+
+  function explainAdd(a, b){
+    // Round the second number up to a ten, add, then take back the extra.
+    const up = Math.ceil(b/10)*10;
+    const extra = up - b;
+    const steps = [];
+    if(extra === 0){
+      steps.push(`${b} is already a round number, so add it in one go.`);
+      steps.push(`${a} + ${b} = ${a+b}.`);
+    } else {
+      steps.push(`Round ${b} up to ${up} (that's ${extra} more than ${b}).`);
+      steps.push(`Add the round number: ${a} + ${up} = ${a+up}.`);
+      steps.push(`Take back the extra ${extra}: ${a+up} \u2212 ${extra} = ${a+b}.`);
+    }
+    return {
+      title:"Round, add, adjust",
+      tip:"Rounding one number to the nearest ten makes the addition easy \u2014 then undo the rounding at the end.",
+      steps, answer:a+b
+    };
+  }
+
+  function explainSub(a, b){
+    // Count up from b to a (shopkeeper's method): to a friendly ten, then to a.
+    const up = Math.ceil(b/10)*10;
+    const toTen = up - b;
+    const steps = [];
+    if(toTen === 0 || up > a){
+      // fall back to round-the-subtrahend method
+      const r = Math.ceil(b/10)*10, extra = r - b;
+      if(extra === 0){
+        steps.push(`${b} is a round number, so subtract it directly.`);
+        steps.push(`${a} \u2212 ${b} = ${a-b}.`);
+      } else {
+        steps.push(`Round ${b} up to ${r} (that's ${extra} more than ${b}).`);
+        steps.push(`Subtract the round number: ${a} \u2212 ${r} = ${a-r}.`);
+        steps.push(`You took away ${extra} too much, so add it back: ${a-r} + ${extra} = ${a-b}.`);
+      }
+    } else {
+      steps.push(`Count up from ${b}. First to ${up}: that's ${toTen}.`);
+      steps.push(`Then from ${up} up to ${a}: that's ${a-up}.`);
+      steps.push(`Add the jumps: ${toTen} + ${a-up} = ${a-b}.`);
+    }
+    return {
+      title:"Count up to subtract",
+      tip:"Instead of taking away, count up from the smaller number to the bigger one \u2014 your brain finds gaps more easily than it borrows.",
+      steps, answer:a-b
+    };
+  }
+
+  function explainMul(a, b){
+    // Put the simpler 1-digit factor as the multiplier; split the other by place value.
+    let big = a, small = b;
+    if(b > a && a <= 12){ big = b; small = a; }      // prefer splitting the larger number
+    const steps = [];
+    let title, tip;
+
+    if(small === 10){
+      title = "Multiply by 10"; tip = "Multiplying by 10 just shifts everything one place left \u2014 stick a zero on the end.";
+      steps.push(`${big} \u00D7 10 = ${big}0.`);
+    } else if(small === 11 && big < 100){
+      title = "The \u00D711 trick";
+      tip = "For a 2-digit number \u00D7 11, add its two digits and drop the sum in the middle.";
+      if(big < 10){ steps.push(`${big} \u00D7 11 = ${big*11} (just ${big} twice).`); }
+      else {
+        const d1 = Math.floor(big/10), d0 = big%10, mid = d1+d0;
+        if(mid < 10){ steps.push(`Split ${big} into ${d1} and ${d0}; add them: ${d1}+${d0} = ${mid}.`);
+          steps.push(`Drop ${mid} between them: ${d1}_${d0} \u2192 ${big*11}.`); }
+        else { steps.push(`Digits ${d1}+${d0} = ${mid}, which carries.`);
+          steps.push(`${big} \u00D7 11 = ${big*11}.`); }
+      }
+    } else if(small === 5){
+      title = "\u00D75 = \u00D710, then halve";
+      tip = "Multiplying by 5 is the same as multiplying by 10 and halving \u2014 usually easier.";
+      steps.push(`${big} \u00D7 10 = ${big}0.`);
+      steps.push(`Halve it: ${big}0 \u00F7 2 = ${big*5}.`);
+    } else if(small === 9){
+      title = "\u00D79 = \u00D710 minus one";
+      tip = "Nine is one less than ten, so multiply by 10 and subtract one copy.";
+      steps.push(`${big} \u00D7 10 = ${big}0.`);
+      steps.push(`Subtract one ${big}: ${big}0 \u2212 ${big} = ${big*9}.`);
+    } else if(big >= 10){
+      // place-value split of the larger factor
+      const tens = Math.floor(big/10)*10, ones = big%10;
+      title = "Split into tens and ones";
+      tip = "Break the bigger number into its tens and ones, multiply each part, then add.";
+      if(ones === 0){
+        steps.push(`${big} \u00D7 ${small} = ${big*small}.`);
+      } else {
+        steps.push(`Split ${big} into ${tens} + ${ones}.`);
+        steps.push(`${tens} \u00D7 ${small} = ${tens*small}.`);
+        steps.push(`${ones} \u00D7 ${small} = ${ones*small}.`);
+        steps.push(`Add them: ${tens*small} + ${ones*small} = ${big*small}.`);
+      }
+    } else {
+      title = "Times-table recall";
+      tip = "Both numbers are small \u2014 this is a core times-table fact worth memorising.";
+      steps.push(`${big} \u00D7 ${small} = ${big*small}.`);
+    }
+    return { title, tip, steps, answer:a*b };
+  }
+
+  function explainDiv(dividend, divisor){
+    const q = dividend / divisor;
+    const steps = [];
+    steps.push(`Ask: ${divisor} times what gives ${dividend}?`);
+    if(divisor === 5){
+      steps.push(`Dividing by 5 = doubling, then dividing by 10: ${dividend} \u00D7 2 = ${dividend*2}, then \u00F7 10 = ${q}.`);
+    } else {
+      // build up toward the dividend with friendly multiples
+      const ten = divisor*10;
+      if(dividend >= ten){
+        const rem = dividend - ten;
+        steps.push(`${divisor} \u00D7 10 = ${ten}, leaving ${dividend} \u2212 ${ten} = ${rem}.`);
+        steps.push(`${divisor} \u00D7 ${rem/divisor} = ${rem}, so that's ${rem/divisor} more.`);
+        steps.push(`Total: 10 + ${rem/divisor} = ${q}.`);
+      } else {
+        steps.push(`${divisor} \u00D7 ${q} = ${dividend}, so the answer is ${q}.`);
+      }
+    }
+    return {
+      title:"Turn it into multiplication",
+      tip:"Division is multiplication in reverse \u2014 find the number that fills the gap.",
+      steps, answer:q
+    };
+  }
+
+  function explainPct(pct, base){
+    const steps = [];
+    let title, tip;
+    const ten = base/10;
+    if(pct === 100){
+      title = "100% is the whole thing";
+      tip = "100% of any number is just the number itself.";
+      steps.push(`100% of ${base} = ${base}.`);
+    } else if(pct === 50){
+      title = "50% means halve it";
+      tip = "Fifty percent is just half.";
+      steps.push(`Half of ${base} = ${base/2}.`);
+    } else if(pct === 25){
+      title = "25% means quarter it";
+      tip = "Twenty-five percent is a quarter \u2014 halve, then halve again.";
+      steps.push(`Half of ${base} = ${base/2}.`);
+      steps.push(`Half again: ${base/2} \u00F7 2 = ${base*25/100}.`);
+    } else if(pct === 10){
+      title = "10% means move the decimal";
+      tip = "Ten percent of a number is that number with the decimal shifted one place left.";
+      steps.push(`10% of ${base} = ${ten}.`);
+    } else if(pct % 10 === 0){
+      title = "Build it from 10%";
+      tip = "Find 10% first, then multiply up to the percent you need.";
+      steps.push(`10% of ${base} = ${ten}.`);
+      steps.push(`${pct}% is ${pct/10} \u00D7 that: ${pct/10} \u00D7 ${ten} = ${base*pct/100}.`);
+    } else if(pct === 5){
+      title = "5% is half of 10%";
+      tip = "Find 10%, then halve it.";
+      steps.push(`10% of ${base} = ${ten}.`);
+      steps.push(`Half of that: ${ten} \u00F7 2 = ${base*5/100}.`);
+    } else if(pct === 15){
+      title = "15% = 10% + 5%";
+      tip = "Add 10% and half of 10% \u2014 the classic tip-calculation trick.";
+      steps.push(`10% of ${base} = ${ten}.`);
+      steps.push(`5% is half of that: ${ten/2}.`);
+      steps.push(`Add them: ${ten} + ${ten/2} = ${base*15/100}.`);
+    } else {
+      // percent-flip: x% of y = y% of x, and build from 10%s + 1%s
+      title = "Build from 10% and 1%";
+      tip = `Handy flip: ${pct}% of ${base} equals ${base}% of ${pct}. Or build it from 10% and 1% chunks.`;
+      const onePct = base/100;
+      const tensPart = Math.floor(pct/10);
+      const onesPart = pct%10;
+      steps.push(`10% of ${base} = ${ten}; 1% of ${base} = ${onePct}.`);
+      if(tensPart>0) steps.push(`${tensPart*10}% = ${tensPart} \u00D7 ${ten} = ${tensPart*ten}.`);
+      if(onesPart>0) steps.push(`${onesPart}% = ${onesPart} \u00D7 ${onePct} = ${onesPart*onePct}.`);
+      steps.push(`Add the parts: ${base*pct/100}.`);
+    }
+    return { title, tip, steps, answer:base*pct/100 };
+  }
+
   function genPct(cfg){
     const p = pick(cfg.pcts);
     const step = 100/gcd(p,100);
     const base = step * ri(cfg.pMult[0], cfg.pMult[1]);
-    return { text:`${p}% of ${base}`, ans:(base*p)/100, op:"pct" };
+    return { text:`${p}% of ${base}`, ans:(base*p)/100, op:"pct", pct:p, base:base };
   }
   function genProblem(){
     const cfg = LEVELS[profile.level-1];
@@ -569,19 +802,19 @@
     let a,b;
     if(op==="add"){
       a=ri(cfg.add[0],cfg.add[1]); b=ri(cfg.add[0],cfg.add[1]);
-      return {text:`${a} + ${b}`, ans:a+b, op};
+      return {text:`${a} + ${b}`, ans:a+b, op, a, b};
     }
     if(op==="sub"){
       a=ri(cfg.sub[0],cfg.sub[1]); b=ri(cfg.subB, a);
-      return {text:`${a} \u2212 ${b}`, ans:a-b, op};
+      return {text:`${a} \u2212 ${b}`, ans:a-b, op, a, b};
     }
     if(op==="mul"){
       a=ri(cfg.mul[0],cfg.mul[1]); b=ri(cfg.mul[2],cfg.mul[3]);
-      return {text:`${a} \u00D7 ${b}`, ans:a*b, op};
+      return {text:`${a} \u00D7 ${b}`, ans:a*b, op, a, b};
     }
     if(op==="div"){
       const d=ri(cfg.div[0],cfg.div[1]), q=ri(cfg.div[2],cfg.div[3]);
-      return {text:`${d*q} \u00F7 ${d}`, ans:q, op};
+      return {text:`${d*q} \u00F7 ${d}`, ans:q, op, a:d*q, b:d};
     }
     return genPct(cfg);
   }
@@ -655,6 +888,7 @@
     run.current = genProblem();
     run.entry = "";
     run.locked = false;
+    $("helpOverlay").classList.add("hide");
     $("prob").textContent = run.current.text;
     $("repNow").textContent = run.idx + 1;
     $("setFill").style.width = (run.idx/run.len*100) + "%";
@@ -791,6 +1025,27 @@
   }
 
   // ---------- stats sheet ----------
+  function openHelp(){
+    if(!run || !run.current) return;
+    const p = run.current;
+    const ex = explain(p);
+    $("helpProblem").textContent = p.text + " = ?";
+    $("helpStrategy").textContent = ex.title;
+    $("helpTip").textContent = ex.tip;
+    const ol = $("helpSteps");
+    ol.innerHTML = "";
+    ex.steps.forEach(s=>{
+      const li = document.createElement("li");
+      const span = document.createElement("span");
+      span.className = "help-step-txt";
+      span.textContent = s;
+      li.appendChild(span);
+      ol.appendChild(li);
+    });
+    $("helpAnswer").innerHTML = "Answer: <b>" + ex.answer + "</b>";
+    $("helpOverlay").classList.remove("hide");
+  }
+
   function renderStats(){
     $("oTotal").textContent = profile.totalSolved;
     $("oAcc").textContent = profile.totalSolved ? Math.round(profile.totalCorrect/profile.totalSolved*100)+"%" : "\u2014";
@@ -854,6 +1109,14 @@
     });
     // hardware keyboard support
     document.addEventListener("keydown", e=>{
+      const helpOpen = !$("helpOverlay").classList.contains("hide");
+      const statsOpen = !$("statsOverlay").classList.contains("hide");
+      if(e.key==="Escape"){
+        if(helpOpen) $("helpOverlay").classList.add("hide");
+        else if(statsOpen) $("statsOverlay").classList.add("hide");
+        return;
+      }
+      if(helpOpen || statsOpen) return;       // don't feed the keypad while a panel is up
       if($("drill").classList.contains("hide")) return;
       if(/^[0-9]$/.test(e.key)) pressKey(e.key);
       else if(e.key==="Backspace"){ e.preventDefault(); pressKey("del"); }
@@ -863,6 +1126,9 @@
     $("openStats").addEventListener("click", ()=>{ renderStats(); $("statsOverlay").classList.remove("hide"); });
     $("closeStats").addEventListener("click", ()=>$("statsOverlay").classList.add("hide"));
     $("statsOverlay").addEventListener("click", e=>{ if(e.target.id==="statsOverlay") $("statsOverlay").classList.add("hide"); });
+    $("helpBtn").addEventListener("click", openHelp);
+    $("closeHelp").addEventListener("click", ()=>$("helpOverlay").classList.add("hide"));
+    $("helpOverlay").addEventListener("click", e=>{ if(e.target.id==="helpOverlay") $("helpOverlay").classList.add("hide"); });
     $("resetBtn").addEventListener("click", async ()=>{
       if(!confirm("Reset all progress? This clears your streak, stats and history.")) return;
       try{ await Store.delete(STORE_KEY); }catch(e){}

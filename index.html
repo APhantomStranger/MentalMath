@@ -11,9 +11,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Mental Growth">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%23EEF4EC'/%3E%3Cpath d='M60 96 V58' stroke='%234A6A52' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='60' cy='50' r='22' fill='%232EA86A'/%3E%3Ccircle cx='44' cy='56' r='14' fill='%231F8E54'/%3E%3Ccircle cx='76' cy='55' r='14' fill='%235FB83C'/%3E%3Ccircle cx='54' cy='38' r='14' fill='%235FB83C'/%3E%3Ccircle cx='68' cy='40' r='13' fill='%232EA86A'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%23EEF4EC'/%3E%3Cpath d='M60 96 V58' stroke='%234A6A52' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='60' cy='50' r='22' fill='%232EA86A'/%3E%3Ccircle cx='44' cy='56' r='14' fill='%231F8E54'/%3E%3Ccircle cx='76' cy='55' r='14' fill='%235FB83C'/%3E%3Ccircle cx='54' cy='38' r='14' fill='%235FB83C'/%3E%3Ccircle cx='68' cy='40' r='13' fill='%232EA86A'/%3E%3C/svg%3E">
-<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Mental%20Growth%22,%22short_name%22:%22Mental%20Growth%22,%22start_url%22:%22./%22,%22display%22:%22standalone%22,%22background_color%22:%22%23EEF4EC%22,%22theme_color%22:%22%232EA86A%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20120%20120'%3E%3Crect%20width='120'%20height='120'%20rx='26'%20fill='%23EEF4EC'/%3E%3Cpath%20d='M60%2096%20V58'%20stroke='%234A6A52'%20stroke-width='7'%20stroke-linecap='round'/%3E%3Ccircle%20cx='60'%20cy='50'%20r='22'%20fill='%232EA86A'/%3E%3Ccircle%20cx='44'%20cy='56'%20r='14'%20fill='%231F8E54'/%3E%3Ccircle%20cx='76'%20cy='55'%20r='14'%20fill='%235FB83C'/%3E%3Ccircle%20cx='54'%20cy='38'%20r='14'%20fill='%235FB83C'/%3E%3Ccircle%20cx='68'%20cy='40'%20r='13'%20fill='%232EA86A'/%3E%3C/svg%3E%22,%22sizes%22:%22any%22,%22type%22:%22image/svg+xml%22}]}">
+<link rel="icon" href="icon-512.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
 <style>html,body{height:100%;margin:0;background:#EEF4EC;-webkit-text-size-adjust:100%;overscroll-behavior-y:none}</style>
 </head>
 <body>
@@ -56,18 +56,29 @@
   .iconbtn svg{width:18px; height:18px}
 
   /* ===== home ===== */
-  .streak-card{display:flex; align-items:center; justify-content:space-between; gap:12px;
-    background:linear-gradient(135deg,#FFFFFF,#EAF4E6); position:relative; overflow:hidden; min-height:150px}
+  .streak-card{display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:2px; padding:18px 16px;
+    background:linear-gradient(135deg,#FFFFFF,#EAF4E6); position:relative; overflow:hidden}
   .streak-card::after{content:""; position:absolute; right:-30px; top:-30px; width:140px; height:140px;
     background:radial-gradient(circle, rgba(46,168,106,.16), transparent 70%)}
-  .streak-num{font-size:50px; font-weight:800; line-height:.9; letter-spacing:-.03em}
-  .streak-meta{font-size:12px; color:var(--muted); margin-top:6px; max-width:165px}
-  .plant-wrap{display:flex; flex-direction:column; align-items:center; gap:5px; flex:0 0 auto; position:relative; z-index:1}
+  .streak-num{font-size:50px; font-weight:800; line-height:.95; letter-spacing:-.03em}
+  .streak-meta{font-size:12px; color:var(--muted); margin-top:2px}
+  .plant-wrap{display:flex; flex-direction:column; align-items:center; gap:6px; flex:0 0 auto; position:relative; z-index:1}
   .plant{width:94px; height:110px; display:flex; align-items:flex-end; justify-content:center}
   .plant svg{width:100%; height:100%; overflow:visible}
   .plant.sm{width:62px; height:72px}
   .stage-name{font-size:11px; font-weight:800; color:var(--accent); letter-spacing:.06em; text-transform:uppercase}
   .next-stage{font-size:10px; color:var(--muted); text-align:center; line-height:1.3; max-width:104px}
+
+  /* home & drill stretch to fill the viewport so the bottom feature can claim leftover space */
+  #home, #drill{display:flex; flex-direction:column; gap:14px; flex:1; min-height:0}
+  .grow-feature{flex:1; min-height:160px; display:flex; align-items:center; justify-content:center;
+    padding:4px 8px 2px}
+  .plant.big{width:clamp(150px, 55vw, 240px); height:clamp(175px, 64vw, 280px)}
+  .stage-name.big{font-size:15px; letter-spacing:.07em}
+  .next-stage.big{font-size:12.5px; max-width:230px}
+  .grow-feature.drill{min-height:110px; padding-top:2px}
+  .plant.drill{width:clamp(110px, 40vw, 170px); height:clamp(128px, 46.7vw, 198px)}
 
   .goal-label{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px}
   .goal-count{font-size:13px; color:var(--muted)}
@@ -218,16 +229,9 @@
     </div>
 
     <div class="card streak-card">
-      <div>
-        <div class="eyebrow">Day streak</div>
-        <div class="streak-num num" id="streakNum">0</div>
-        <div class="streak-meta" id="streakMeta">Start today to begin a streak</div>
-      </div>
-      <div class="plant-wrap">
-        <div class="plant" id="plant"></div>
-        <div class="stage-name" id="stageName">Seed</div>
-        <div class="next-stage" id="nextStage"></div>
-      </div>
+      <div class="eyebrow">Day streak</div>
+      <div class="streak-num num" id="streakNum">0</div>
+      <div class="streak-meta" id="streakMeta">Start today to begin a streak</div>
     </div>
 
     <div class="card">
@@ -279,6 +283,14 @@
     </div>
 
     <button class="start" id="startBtn">Start set &#183; 10 reps</button>
+
+    <div class="grow-feature">
+      <div class="plant-wrap">
+        <div class="plant big" id="plant"></div>
+        <div class="stage-name big" id="stageName">Seed</div>
+        <div class="next-stage big" id="nextStage"></div>
+      </div>
+    </div>
   </div>
 
   <!-- ============ DRILL ============ -->
@@ -311,6 +323,10 @@
       <button class="key util" data-k="del" aria-label="Delete">&#9003;</button>
       <button class="key" data-k="0">0</button>
       <button class="key enter" data-k="enter" aria-label="Enter">&#10003;</button>
+    </div>
+
+    <div class="grow-feature drill">
+      <div class="plant drill" id="plantDrill"></div>
     </div>
   </div>
 
@@ -451,15 +467,16 @@
       + `<g transform="translate(60 124) scale(${scale}) translate(-60 -124)">${plantBody(idx)}</g></svg>`;
   }
 
-  function renderPlant(el, g, caption){
+  function renderPlant(el, g, nameEl, nextEl){
     const st = plantStage(g);
     const sc = (1 + 0.12*st.frac).toFixed(3);
     el.innerHTML = plantSVG(st.idx, sc);
-    if(caption){
-      $("stageName").textContent = st.name;
-      const ns = $("nextStage");
-      if(st.nextName) ns.textContent = st.daysToNext + (st.daysToNext===1?" day to ":" days to ") + st.nextName.toLowerCase();
-      else ns.textContent = "Fully grown \u2014 fruit and all";
+    if(nameEl){
+      nameEl.textContent = st.name;
+    }
+    if(nextEl){
+      if(st.nextName) nextEl.textContent = st.daysToNext + (st.daysToNext===1?" day to ":" days to ") + st.nextName.toLowerCase();
+      else nextEl.textContent = "Fully grown \u2014 fruit and all";
     }
   }
 
@@ -583,7 +600,7 @@
     if(profile.lastActiveDate===t) $("streakMeta").textContent = "Trained today \u2014 keep it alive tomorrow";
     else if(profile.lastActiveDate===shiftDay(t,-1)) $("streakMeta").textContent = "Train today to extend your streak";
     else $("streakMeta").textContent = "Start today to begin a streak";
-    renderPlant($("plant"), profile.growthDays, true);
+    renderPlant($("plant"), profile.growthDays, $("stageName"), $("nextStage"));
 
     const todayRec = profile.history[t] || [0,0];
     const done = todayRec[0], goal = profile.dailyGoal;
@@ -630,6 +647,7 @@
     run = { idx:0, correct:0, entry:"", locked:false,
             len:profile.setLength, opCounts:{}, current:null };
     $("repTot").textContent = run.len;
+    renderPlant($("plantDrill"), profile.growthDays, null, null);
     show("drill");
     nextProblem();
   }
@@ -690,6 +708,7 @@
 
     const grew = !!pendingGrowToast;
     if(grew){ toast("\uD83C\uDF31 Grew into a "+pendingGrowToast.toLowerCase()+"!"); pendingGrowToast = null; }
+    renderPlant($("plantDrill"), profile.growthDays, null, null);
 
     // feedback
     const con = $("console"), v = $("verdict");
@@ -747,7 +766,7 @@
   }
 
   function finishSet(){
-    renderPlant($("sumPlant"), profile.growthDays, false);
+    renderPlant($("sumPlant"), profile.growthDays, null, null);
     $("sumCorrect").textContent = run.correct;
     $("sumTotal").textContent = run.len;
     const acc = Math.round(run.correct/run.len*100);

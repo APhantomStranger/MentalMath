@@ -153,6 +153,41 @@
   .help-answer{margin-top:20px; padding:14px; text-align:center; border-radius:13px; background:var(--inset);
     font-family:var(--mono); font-size:20px; font-weight:700; color:var(--ink)}
   .help-answer b{color:var(--accent)}
+
+  /* topbar Percent Play button */
+  .topbar-actions{display:flex; align-items:center; gap:8px}
+  .pill-btn{display:inline-flex; align-items:center; gap:5px; height:40px; padding:0 14px; border-radius:11px;
+    background:var(--accent); color:#fff; font-size:13px; font-weight:800; letter-spacing:.01em;
+    border:1px solid transparent; box-shadow:0 3px 10px rgba(30,150,85,.22); transition:.12s; white-space:nowrap}
+  .pill-btn:active{transform:translateY(1px); box-shadow:0 1px 5px rgba(30,150,85,.25)}
+  .pill-btn .pct-glyph{font-family:var(--mono); font-size:15px; font-weight:700}
+
+  /* Percent Play screen */
+  #percent{display:flex; flex-direction:column; flex:1; min-height:0}
+  .pf-head{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 2px; margin-bottom:16px}
+  .pf-title{font-size:18px; font-weight:800; letter-spacing:-.01em; flex:1; text-align:center}
+  .pf-clear{font-size:13px; font-weight:700; color:var(--muted); background:var(--surface-2);
+    border:1px solid var(--line); border-radius:10px; padding:9px 13px}
+  .pf-clear:active{transform:translateY(1px)}
+  .pf-row{display:flex; align-items:flex-end; gap:9px; margin-bottom:14px}
+  .pf-box{flex:1; background:var(--surface); border:2px solid var(--line); border-radius:14px;
+    padding:11px 13px 13px; text-align:left; min-width:0; transition:border-color .15s, box-shadow .15s}
+  .pf-box.active{border-color:var(--accent); box-shadow:0 0 0 3px rgba(46,168,106,.12)}
+  .pf-box:active{transform:none}
+  .pf-label{display:block; font-size:10px; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:7px}
+  .pf-val{font-family:var(--mono); font-size:30px; font-weight:700; color:var(--ink); display:flex; align-items:baseline; overflow:hidden; min-height:36px}
+  .pf-val .ph{color:var(--line)}
+  .pf-pct{font-size:23px; color:var(--accent); font-weight:700; margin-left:1px}
+  .pf-caret{display:inline-block; width:2px; height:27px; background:var(--accent); transform:translateY(4px); margin-left:1px; animation:blink 1.05s steps(1) infinite}
+  .pf-of{font-size:14px; font-weight:700; color:var(--muted); padding-bottom:16px; flex:0 0 auto; text-transform:uppercase; letter-spacing:.06em}
+
+  .pf-result{background:var(--inset); border:1px solid var(--line); border-radius:14px; padding:14px 12px; text-align:center; margin-bottom:14px}
+  .pf-eq{font-family:var(--mono); font-size:15px; color:var(--muted); line-height:1.3}
+  .pf-out{font-family:var(--mono); font-size:34px; font-weight:800; color:var(--accent); margin-top:3px; min-height:6px; letter-spacing:-.01em}
+
+  .pf-breakdown{flex:1; min-height:60px; overflow-y:auto; margin-bottom:12px; -webkit-overflow-scrolling:touch}
+  .pf-breakdown .help-strategy{margin-top:2px}
+  .pf-pad{flex:0 0 auto}
   .set-bar > span{display:block; height:100%; background:var(--accent-2); transition:width .35s ease}
 
   .console{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
@@ -240,10 +275,15 @@
   <div id="home">
     <div class="topbar">
       <div class="wordmark">Mental Growth<span class="dot"></span></div>
-      <button class="iconbtn" id="openStats" aria-label="View stats">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-          <path d="M4 19V10M10 19V5M16 19v-6M22 19H2"/></svg>
-      </button>
+      <div class="topbar-actions">
+        <button class="pill-btn" id="openPercent">
+          <span class="pct-glyph">%</span> Percent Play
+        </button>
+        <button class="iconbtn" id="openStats" aria-label="View stats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M4 19V10M10 19V5M16 19v-6M22 19H2"/></svg>
+        </button>
+      </div>
     </div>
 
     <div class="card streak-card">
@@ -368,6 +408,52 @@
     <div class="summary-actions">
       <button class="btn btn-ghost" id="doneBtn">Done</button>
       <button class="btn btn-primary" id="againBtn">Train again</button>
+    </div>
+  </div>
+
+  <!-- ============ PERCENT PLAY ============ -->
+  <div id="percent" class="hide">
+    <div class="pf-head">
+      <button class="iconbtn" id="pctBack" aria-label="Back to home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="pf-title">Percent Play</div>
+      <button class="pf-clear" id="pfClear">Clear</button>
+    </div>
+
+    <div class="pf-row">
+      <button class="pf-box active" id="pfPctBox" data-field="pct">
+        <span class="pf-label">Percent</span>
+        <span class="pf-val"><span id="pfPctVal" class="ph">0</span><span class="pf-pct">%</span></span>
+      </button>
+      <div class="pf-of">of</div>
+      <button class="pf-box" id="pfNumBox" data-field="num">
+        <span class="pf-label">Number</span>
+        <span class="pf-val"><span id="pfNumVal" class="ph">0</span></span>
+      </button>
+    </div>
+
+    <div class="pf-result">
+      <div class="pf-eq" id="pfEq">Enter a percent and a number</div>
+      <div class="pf-out" id="pfOut"></div>
+    </div>
+
+    <div class="pf-breakdown" id="pfBreakdown"></div>
+
+    <div class="pad pf-pad" id="pfPad">
+      <button class="key" data-k="7">7</button>
+      <button class="key" data-k="8">8</button>
+      <button class="key" data-k="9">9</button>
+      <button class="key" data-k="4">4</button>
+      <button class="key" data-k="5">5</button>
+      <button class="key" data-k="6">6</button>
+      <button class="key" data-k="1">1</button>
+      <button class="key" data-k="2">2</button>
+      <button class="key" data-k="3">3</button>
+      <button class="key util" data-k="dot" aria-label="Decimal point">.</button>
+      <button class="key" data-k="0">0</button>
+      <button class="key util" data-k="del" aria-label="Delete">&#9003;</button>
     </div>
   </div>
 </div>
@@ -737,56 +823,68 @@
     };
   }
 
+  function fmt(n){
+    if(!isFinite(n)) return String(n);
+    const r = Math.round(n * 1e6) / 1e6;
+    return Number.isInteger(r) ? String(r) : String(parseFloat(r.toFixed(6)));
+  }
+
   function explainPct(pct, base){
     const steps = [];
     let title, tip;
-    const ten = base/10;
+    const ten = base/10, ans = base*pct/100;
     if(pct === 100){
       title = "100% is the whole thing";
       tip = "100% of any number is just the number itself.";
-      steps.push(`100% of ${base} = ${base}.`);
+      steps.push(`100% of ${fmt(base)} = ${fmt(base)}.`);
     } else if(pct === 50){
       title = "50% means halve it";
       tip = "Fifty percent is just half.";
-      steps.push(`Half of ${base} = ${base/2}.`);
+      steps.push(`Half of ${fmt(base)} = ${fmt(base/2)}.`);
     } else if(pct === 25){
       title = "25% means quarter it";
       tip = "Twenty-five percent is a quarter \u2014 halve, then halve again.";
-      steps.push(`Half of ${base} = ${base/2}.`);
-      steps.push(`Half again: ${base/2} \u00F7 2 = ${base*25/100}.`);
+      steps.push(`Half of ${fmt(base)} = ${fmt(base/2)}.`);
+      steps.push(`Half again: ${fmt(base/2)} \u00F7 2 = ${fmt(ans)}.`);
     } else if(pct === 10){
       title = "10% means move the decimal";
       tip = "Ten percent of a number is that number with the decimal shifted one place left.";
-      steps.push(`10% of ${base} = ${ten}.`);
+      steps.push(`10% of ${fmt(base)} = ${fmt(ten)}.`);
+    } else if(pct === 0){
+      title = "0% is nothing";
+      tip = "Zero percent of anything is zero.";
+      steps.push(`0% of ${fmt(base)} = 0.`);
     } else if(pct % 10 === 0){
       title = "Build it from 10%";
       tip = "Find 10% first, then multiply up to the percent you need.";
-      steps.push(`10% of ${base} = ${ten}.`);
-      steps.push(`${pct}% is ${pct/10} \u00D7 that: ${pct/10} \u00D7 ${ten} = ${base*pct/100}.`);
+      steps.push(`10% of ${fmt(base)} = ${fmt(ten)}.`);
+      steps.push(`${fmt(pct)}% is ${fmt(pct/10)} \u00D7 that: ${fmt(pct/10)} \u00D7 ${fmt(ten)} = ${fmt(ans)}.`);
     } else if(pct === 5){
       title = "5% is half of 10%";
       tip = "Find 10%, then halve it.";
-      steps.push(`10% of ${base} = ${ten}.`);
-      steps.push(`Half of that: ${ten} \u00F7 2 = ${base*5/100}.`);
+      steps.push(`10% of ${fmt(base)} = ${fmt(ten)}.`);
+      steps.push(`Half of that: ${fmt(ten)} \u00F7 2 = ${fmt(ans)}.`);
     } else if(pct === 15){
       title = "15% = 10% + 5%";
       tip = "Add 10% and half of 10% \u2014 the classic tip-calculation trick.";
-      steps.push(`10% of ${base} = ${ten}.`);
-      steps.push(`5% is half of that: ${ten/2}.`);
-      steps.push(`Add them: ${ten} + ${ten/2} = ${base*15/100}.`);
+      steps.push(`10% of ${fmt(base)} = ${fmt(ten)}.`);
+      steps.push(`5% is half of that: ${fmt(ten/2)}.`);
+      steps.push(`Add them: ${fmt(ten)} + ${fmt(ten/2)} = ${fmt(ans)}.`);
     } else {
       // percent-flip: x% of y = y% of x, and build from 10%s + 1%s
       title = "Build from 10% and 1%";
-      tip = `Handy flip: ${pct}% of ${base} equals ${base}% of ${pct}. Or build it from 10% and 1% chunks.`;
+      tip = `Handy flip: ${fmt(pct)}% of ${fmt(base)} equals ${fmt(base)}% of ${fmt(pct)}. Or build it from 10% and 1% chunks.`;
       const onePct = base/100;
       const tensPart = Math.floor(pct/10);
-      const onesPart = pct%10;
-      steps.push(`10% of ${base} = ${ten}; 1% of ${base} = ${onePct}.`);
-      if(tensPart>0) steps.push(`${tensPart*10}% = ${tensPart} \u00D7 ${ten} = ${tensPart*ten}.`);
-      if(onesPart>0) steps.push(`${onesPart}% = ${onesPart} \u00D7 ${onePct} = ${onesPart*onePct}.`);
-      steps.push(`Add the parts: ${base*pct/100}.`);
+      const onesPart = Math.round((pct - tensPart*10) * 1e6) / 1e6;
+      steps.push(`10% of ${fmt(base)} = ${fmt(ten)}; 1% of ${fmt(base)} = ${fmt(onePct)}.`);
+      const parts = [];
+      if(tensPart > 0){ steps.push(`${fmt(tensPart*10)}% = ${fmt(tensPart)} \u00D7 ${fmt(ten)} = ${fmt(tensPart*ten)}.`); parts.push(fmt(tensPart*ten)); }
+      if(onesPart > 0){ steps.push(`${fmt(onesPart)}% = ${fmt(onesPart)} \u00D7 ${fmt(onePct)} = ${fmt(onesPart*onePct)}.`); parts.push(fmt(onesPart*onePct)); }
+      if(parts.length > 1) steps.push(`Add the parts: ${parts.join(" + ")} = ${fmt(ans)}.`);
+      else steps.push(`So ${fmt(pct)}% of ${fmt(base)} = ${fmt(ans)}.`);
     }
-    return { title, tip, steps, answer:base*pct/100 };
+    return { title, tip, steps, answer:ans };
   }
 
   function genPct(cfg){
@@ -871,7 +969,7 @@
   }
 
   function show(screen){
-    ["home","drill","summary"].forEach(s=>$(s).classList.toggle("hide", s!==screen));
+    ["home","drill","summary","percent"].forEach(s=>$(s).classList.toggle("hide", s!==screen));
     window.scrollTo(0,0);
   }
 
@@ -1046,6 +1144,76 @@
     $("helpOverlay").classList.remove("hide");
   }
 
+  // ---------- Percent Play ----------
+  const pf = { pct:"", num:"", field:"pct" };
+
+  function openPercent(){
+    pf.pct = ""; pf.num = ""; pf.field = "pct";
+    pfRender();
+    show("percent");
+  }
+  function pfSetField(f){
+    pf.field = f;
+    $("pfPctBox").classList.toggle("active", f==="pct");
+    $("pfNumBox").classList.toggle("active", f==="num");
+    pfRender();
+  }
+  function pfPressKey(k){
+    let cur = pf[pf.field];
+    if(k==="del"){
+      cur = cur.slice(0,-1);
+    } else if(k==="dot"){
+      if(cur.indexOf(".")===-1 && cur.replace(".","").length < 9) cur = (cur===""? "0." : cur+".");
+    } else {
+      if(cur.replace(".","").length >= 9) return;        // cap digits
+      cur = (cur==="0") ? k : cur + k;
+    }
+    pf[pf.field] = cur;
+    pfRender();
+  }
+  function pfRenderCell(el, str, active){
+    const caret = active ? '<span class="pf-caret"></span>' : '';
+    if(str === ""){ el.className = "ph"; el.innerHTML = "0" + caret; }
+    else { el.className = ""; el.innerHTML = str + caret; }
+  }
+  function buildExplanation(container, ex){
+    container.innerHTML = "";
+    const strat = document.createElement("div");
+    strat.className = "help-strategy"; strat.textContent = ex.title;
+    const tip = document.createElement("div");
+    tip.className = "help-tip"; tip.textContent = ex.tip;
+    const ol = document.createElement("ol");
+    ol.className = "help-steps";
+    ex.steps.forEach(s=>{
+      const li = document.createElement("li");
+      const sp = document.createElement("span");
+      sp.className = "help-step-txt"; sp.textContent = s;
+      li.appendChild(sp); ol.appendChild(li);
+    });
+    const ans = document.createElement("div");
+    ans.className = "help-answer"; ans.innerHTML = "Answer: <b>" + fmt(ex.answer) + "</b>";
+    container.appendChild(strat); container.appendChild(tip); container.appendChild(ol); container.appendChild(ans);
+  }
+  function pfRender(){
+    pfRenderCell($("pfPctVal"), pf.pct, pf.field==="pct");
+    pfRenderCell($("pfNumVal"), pf.num, pf.field==="num");
+    const eq = $("pfEq"), out = $("pfOut"), bd = $("pfBreakdown");
+    if(pf.pct === "" || pf.num === ""){
+      eq.textContent = (pf.pct === "" && pf.num === "")
+        ? "Enter a percent and a number"
+        : "Enter both a percent and a number";
+      out.textContent = "";
+      bd.innerHTML = "";
+      return;
+    }
+    const pctN = parseFloat(pf.pct), numN = parseFloat(pf.num);
+    if(!isFinite(pctN) || !isFinite(numN)){ eq.textContent = "\u2014"; out.textContent = ""; bd.innerHTML = ""; return; }
+    const result = pctN/100*numN;
+    eq.textContent = `${fmt(pctN)}% of ${fmt(numN)} =`;
+    out.textContent = fmt(result);
+    buildExplanation(bd, explainPct(pctN, numN));
+  }
+
   function renderStats(){
     $("oTotal").textContent = profile.totalSolved;
     $("oAcc").textContent = profile.totalSolved ? Math.round(profile.totalCorrect/profile.totalSolved*100)+"%" : "\u2014";
@@ -1111,12 +1279,21 @@
     document.addEventListener("keydown", e=>{
       const helpOpen = !$("helpOverlay").classList.contains("hide");
       const statsOpen = !$("statsOverlay").classList.contains("hide");
+      const pctOpen = !$("percent").classList.contains("hide");
       if(e.key==="Escape"){
         if(helpOpen) $("helpOverlay").classList.add("hide");
         else if(statsOpen) $("statsOverlay").classList.add("hide");
+        else if(pctOpen){ renderHome(); show("home"); }
         return;
       }
       if(helpOpen || statsOpen) return;       // don't feed the keypad while a panel is up
+      if(pctOpen){
+        if(/^[0-9]$/.test(e.key)) pfPressKey(e.key);
+        else if(e.key===".") pfPressKey("dot");
+        else if(e.key==="Backspace"){ e.preventDefault(); pfPressKey("del"); }
+        else if(e.key==="Tab"){ e.preventDefault(); pfSetField(pf.field==="pct"?"num":"pct"); }
+        return;
+      }
       if($("drill").classList.contains("hide")) return;
       if(/^[0-9]$/.test(e.key)) pressKey(e.key);
       else if(e.key==="Backspace"){ e.preventDefault(); pressKey("del"); }
@@ -1129,6 +1306,13 @@
     $("helpBtn").addEventListener("click", openHelp);
     $("closeHelp").addEventListener("click", ()=>$("helpOverlay").classList.add("hide"));
     $("helpOverlay").addEventListener("click", e=>{ if(e.target.id==="helpOverlay") $("helpOverlay").classList.add("hide"); });
+
+    $("openPercent").addEventListener("click", openPercent);
+    $("pctBack").addEventListener("click", ()=>{ renderHome(); show("home"); });
+    $("pfClear").addEventListener("click", ()=>{ pf.pct=""; pf.num=""; pfSetField("pct"); });
+    $("pfPctBox").addEventListener("click", ()=>pfSetField("pct"));
+    $("pfNumBox").addEventListener("click", ()=>pfSetField("num"));
+    $("pfPad").addEventListener("click", e=>{ const b=e.target.closest(".key"); if(b) pfPressKey(b.dataset.k); });
     $("resetBtn").addEventListener("click", async ()=>{
       if(!confirm("Reset all progress? This clears your streak, stats and history.")) return;
       try{ await Store.delete(STORE_KEY); }catch(e){}
